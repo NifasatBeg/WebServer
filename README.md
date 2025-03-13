@@ -27,7 +27,7 @@ seq 500 | xargs -P 50 -I {} curl -o /dev/null -s -w "Request {}: %{time_total} s
 | **Avg Response Time (s)**  | 4.745           | 0.991          | 1.001       |
 | **Min Response Time (s)**  | 0.162           | 0.331          | 0.313       |
 | **Max Response Time (s)**  | 5.447           | 1.562          | 1.616       |
-| **Std Dev (s)**           | 0.882           | 0.271          | 0.286       |
+| **Std Dev (s)**            | 0.882           | 0.271          | 0.286       |
 
 ### **Analysis & Conclusion**
 - The **Multi-Threaded model** shows the best stability with consistent response times and the lowest variance.
@@ -38,10 +38,46 @@ seq 500 | xargs -P 50 -I {} curl -o /dev/null -s -w "Request {}: %{time_total} s
 🚀 **Multi-Threaded is the most stable choice** for handling concurrent requests efficiently.  
 📉 **Single-threaded should be avoided for high-load scenarios.**
 
+## Theory
+The client-to-socket mapping is done at multiple levels, depending on whether you're referring to low-level OS networking or application-level server handling:
+
+### **1. OS-Level (TCP/IP Stack)**
+- The OS maintains a mapping between the client IP/port and the server socket.
+- The server’s listening socket (via `bind()` and `listen()`) accepts new connections.
+- When a client connects, the OS creates a new socket (file descriptor) for that client. This socket maps the client's IP & port to a server-side socket.
+
+### **2. Application-Level (Server-Side Code)**
+- In server applications (like Python, Java, or Node.js), client-socket mapping is often handled in a hashmap or dictionary to track client connections.
+- In multi-threaded or event-driven servers, each client socket is mapped to a connection object or worker thread/process.
+
+**Example in Python (socketserver):**
+
+```python
+clients = {}  # Dictionary to map client addresses to sockets
+
+def handle_client(client_socket, client_address):
+    clients[client_address] = client_socket  # Store mapping
+    while True:
+        data = client_socket.recv(1024)
+        if not data:
+            break
+        print(f"Received from {client_address}: {data}")
+
+    del clients[client_address]  # Remove when client disconnects
+    client_socket.close()
+```
+
+### **3. In Load Balancers & Reverse Proxies**
+- Load balancers (like Nginx, HAProxy) maintain a mapping of client connections to backend servers.
+- This ensures consistent client-server mapping for session persistence.
+
+### **Conclusion**
+- At the **OS level**, mapping is done in the kernel’s TCP stack.
+- At the **application level**, mapping is usually done using hashmaps, lists, or connection pools to track active clients.
+
 ## Future Enhancements
 - Implementing additional concurrency models like async I/O for improved efficiency.
 - Expanding the test with higher concurrency levels for deeper performance insights.
 
 ## Authors
 - [Nifasat]
-
