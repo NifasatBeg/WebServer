@@ -34,14 +34,12 @@ seq 500 | xargs -P 50 -I {} curl -o /dev/null -s -w "Request {}: %{time_total} s
 - The **Thread Pool model** performs similarly but with slightly higher variability.
 - The **Single-Threaded model** struggles with scalability, exhibiting significant delays under heavy load.
 
-### **Verdict**  
-🚀 **The Multi-Threaded model demonstrated the best overall performance with fast and consistent response times, making it the most efficient in this benchmark.
+### **Verdict**
+📉 **Single-threaded processing** has the highest response time and variability, making it unsuitable for performance-critical applications.
 
-⚠️ However, it's important to note that the Multi-Threaded model can become less efficient under extremely high concurrency due to context switching overhead. As thread counts increase, the CPU may spend more time switching between threads rather than executing them, potentially impacting performance.
+🚀 **Multi-threaded execution** significantly reduces response time (0.991s avg) and provides better consistency.
 
-📈 **The Thread Pool model offers a more controlled approach by limiting the number of concurrent threads, which may provide better scalability in scenarios with very high traffic.
-
-📉 **The Single-Threaded model, while simple, struggles with scalability and is unsuitable for handling large numbers of concurrent requests
+📈 **Thread pool execution** offers similar performance to multi-threading (1.001s avg) while maintaining stable resource utilization.
 
 ## Theory
 The client-to-socket mapping is done at multiple levels, depending on whether you're referring to low-level OS networking or application-level server handling:
@@ -85,4 +83,4 @@ def handle_client(client_socket, client_address):
 - Expanding the test with higher concurrency levels for deeper performance insights.
 
 ## Authors
-- [Nifasat]
+- Nifasat
