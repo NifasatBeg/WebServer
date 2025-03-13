@@ -35,8 +35,13 @@ seq 500 | xargs -P 50 -I {} curl -o /dev/null -s -w "Request {}: %{time_total} s
 - The **Single-Threaded model** struggles with scalability, exhibiting significant delays under heavy load.
 
 ### **Verdict**  
-🚀 **Multi-Threaded is the most stable choice** for handling concurrent requests efficiently.  
-📉 **Single-threaded should be avoided for high-load scenarios.**
+🚀 **The Multi-Threaded model demonstrated the best overall performance with fast and consistent response times, making it the most efficient in this benchmark.
+
+⚠️ However, it's important to note that the Multi-Threaded model can become less efficient under extremely high concurrency due to context switching overhead. As thread counts increase, the CPU may spend more time switching between threads rather than executing them, potentially impacting performance.
+
+📈 **The Thread Pool model offers a more controlled approach by limiting the number of concurrent threads, which may provide better scalability in scenarios with very high traffic.
+
+📉 **The Single-Threaded model, while simple, struggles with scalability and is unsuitable for handling large numbers of concurrent requests
 
 ## Theory
 The client-to-socket mapping is done at multiple levels, depending on whether you're referring to low-level OS networking or application-level server handling:
