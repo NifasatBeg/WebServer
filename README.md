@@ -1,3 +1,46 @@
+# Web Server Performance Benchmark
+
+## Overview
+This project implements a basic web server in three different models:
+1. **Single-Threaded** – Handles one request at a time.
+2. **Multi-Threaded** – Spawns a new thread for each request.
+3. **Thread Pool** – Uses a fixed number of worker threads.
+
+The goal is to compare their performance under load and identify the most efficient model.
+
+## Performance Benchmarking
+
+To evaluate the efficiency of different server implementations, we used the following **load-testing command**:
+
+```sh
+seq 500 | xargs -P 50 -I {} curl -o /dev/null -s -w "Request {}: %{time_total} s\n" http://localhost:8080
+```
+
+- `seq 500` → Generates 500 requests.
+- `xargs -P 50` → Runs 50 requests in parallel.
+- `curl -o /dev/null -s -w "Request {}: %{time_total} s\n"` → Measures response time for each request.
+
+### **Benchmark Results**
+
+| Metric                    | Single-Threaded | Multi-Threaded | Thread Pool |
+|---------------------------|---------------:|--------------:|------------:|
+| **Avg Response Time (s)**  | 0.006055       | 0.005674      | 0.005568    |
+| **Min Response Time (s)**  | 0.002298       | 0.002184      | 0.002423    |
+| **Max Response Time (s)**  | 0.048209       | 0.019674      | 0.022847    |
+| **Std Dev (s)**           | 0.004776       | 0.002332      | 0.002908    |
+
+### **Analysis & Conclusion**
+- The **Thread Pool model** has the **lowest average response time (0.005568s)**, making it the most efficient under load.
+- The **Single-Threaded model** has a **very high max response time (0.048s)**, indicating poor scalability.
+- The **Multi-Threaded model** offers a balance between efficiency and consistent response times.
+- **Thread Pool and Multi-Threaded models outperform Single-Threaded significantly**, making them better suited for handling concurrent requests.
+
+### **Verdict**  
+🚀 **Thread Pool is the best choice** for handling concurrent requests efficiently.  
+📉 **Single-threaded should be avoided for high-load scenarios.**
+
+
+## Theory
 The client-to-socket mapping is done at multiple levels, depending on whether you're referring to low-level OS networking or application-level server handling:
 
 1. OS-Level (TCP/IP Stack)
