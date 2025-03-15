@@ -8,7 +8,7 @@ public class Main {
         MultiThreadedServer multiThreadedServer = new MultiThreadedServer();
         ThreadPoolServer threadPoolServer = new ThreadPoolServer();
         try {
-             threadPoolServer.run();
+             multiThreadedServer.run();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } catch (Exception e){
